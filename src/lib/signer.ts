@@ -121,24 +121,23 @@ export async function getWalletAddress(
   network?: TronNetwork,
   forceConnect = false,
 ): Promise<{ address: string; network: TronNetwork }> {
+  // Network is always authoritative from the caller; default to mainnet if not specified.
+  // Cache only supplies the address — SDK/browser handles network switching at sign time.
+  const targetNetwork: TronNetwork = network || 'mainnet';
   let address: string;
-  let walletNetwork: TronNetwork;
+  let walletNetwork: TronNetwork = targetNetwork;
 
   if (ipcClient) {
-    // Try cached wallet — skips creating a Connect pending in the browser tab bar.
-    // When cached network differs from requested, fall through to connectWallet so the
-    // SDK/browser can prompt TronLink to switch; don't short-circuit here.
     const cached = await ipcClient.call('getConnectedWallet', {}) as { address: string; network: string } | null;
-    if (cached && (!network || network === cached.network)) {
+    if (cached) {
       address = cached.address;
-      walletNetwork = cached.network as TronNetwork;
       outputInfo(`Wallet: ${address} (${walletNetwork})`);
     } else {
       outputInfo('Connecting wallet (check browser tab to approve)...');
       let result: { address: string; network: string };
       try {
         result = await withTimeout(
-          ipcClient.call('connectWallet', { network }) as Promise<{ address: string; network: string }>,
+          ipcClient.call('connectWallet', { network: targetNetwork }) as Promise<{ address: string; network: string }>,
           getTimeout(),
           'Wallet connection timed out. Please try again',
         );
@@ -155,19 +154,13 @@ export async function getWalletAddress(
     outputInfo('Connecting wallet...');
     const controller = createSignerAbort();
     const result = await withTimeout(
-      signer.connectWallet(network, { signal: controller.signal }),
+      signer.connectWallet(targetNetwork, { signal: controller.signal }),
       getTimeout(),
       'Wallet connection timed out. Please try again',
     );
     address = result.address;
     walletNetwork = result.network as TronNetwork;
     outputInfo(`Connected: ${address} (${walletNetwork})`);
-  }
-
-  if (network && network !== walletNetwork) {
-    throw new Error(
-      `Network switch failed: requested "${network}" but wallet is on "${walletNetwork}". Please switch TronLink to "${network}" manually and retry.`,
-    );
   }
 
   return { address, network: walletNetwork };
