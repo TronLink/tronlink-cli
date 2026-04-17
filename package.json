@@ -1,7 +1,7 @@
 {
   "name": "@tronlink/tronlink-cli",
-  "version": "0.1.0",
-  "description": "CLI tool for TRON blockchain operations via TronLink wallet signing",
+  "version": "1.0.0",
+  "description": "CLI tool for TRON blockchain operations via TronLink wallet",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,6 +16,27 @@
   "engines": {
     "node": ">=20"
   },
+  "keywords": [
+    "tronlink-cli",
+    "tron",
+    "tronlink",
+    "tronweb",
+    "blockchain",
+    "cli",
+    "wallet",
+    "signer",
+    "trx",
+    "trc20",
+    "crypto"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TronLink/tronlink-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TronLink/tronlink-cli/issues"
+  },
+  "homepage": "https://github.com/TronLink/tronlink-cli#readme",
   "license": "MIT",
   "dependencies": {
     "chalk": "4.1.2",
