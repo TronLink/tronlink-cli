@@ -30,34 +30,12 @@ After installation, the `tronlink` command is available globally.
 | ------------------- | ------- | ---------------------------------------------------------- |
 | `--local-broadcast` | off     | CLI broadcasts locally instead of letting signer broadcast |
 | `--json`            | off     | Output as JSON for scripts / AI agents                     |
-| `--port <n>`        | 3386    | TronLink Signer HTTP server port                           |
 | `--api-key <key>`   | -       | TronGrid API key (or set `TRON_API_KEY` env)               |
 | `--timeout <ms>`    | 300000  | Signing/connection timeout in milliseconds                 |
 
 All option names are **case-insensitive** (e.g. `--toAddress`, `--TOADDRESS`, `--toaddress` are equivalent).
 
 ## Commands
-
-### Session (serve daemon)
-
-A persistent signer daemon is reused across commands so the browser tab stays open and you only approve network/account prompts once per session.
-
-```bash
-# Start in foreground (connects wallet immediately)
-tronlink serve [--network nile]
-
-# Stop the running daemon
-tronlink serve stop
-
-# Explicitly connect and verify the wallet
-tronlink connect [--network nile]
-
-# View or switch the wallet's current network
-tronlink network
-tronlink network --network nile
-```
-
-You don't need to start `serve` manually — other commands auto-spawn a background daemon on first use (logs at `~/.tronlink-cli/daemon.log`). The daemon shuts down automatically when the browser tab is closed.
 
 ### Query (Read)
 
@@ -168,7 +146,7 @@ Write operations (transfer, stake, delegate, vote, etc.) require TronLink approv
 3. User reviews and clicks Approve or Reject
 4. Result is returned to the CLI
 
-The browser window is reused across multiple commands via the shared `serve` daemon — only one browser tab is needed per session. Closing the browser tab shuts down the daemon.
+The browser window is reused across multiple commands — only one browser tab is needed per session. Closing the browser tab ends the session.
 
 Multiple concurrent commands are supported. The browser UI shows each pending request as its own tab; approve them in any order.
 
@@ -214,7 +192,6 @@ All inputs are validated before connecting to TronLink:
 - **Contract existence**: verified on the specified network before querying decimals
 - **Vote counts**: positive integers, no duplicate SR addresses
 - **Network**: must be `mainnet`, `nile`, or `shasta`
-- **Port**: integer between 1 and 65535
 - **Decimals**: non-negative integer (0-77)
 - **Fee limit**: positive number in TRX (TRC20/TRC721 only)
 - **Transfer type validation**: missing required params or extra inapplicable params are rejected with clear errors
@@ -239,7 +216,7 @@ Invalid inputs are rejected immediately with a clear error before any wallet int
 
 1. CLI parses command and validates all inputs
 2. For read operations with `--address`: queries TronGrid directly
-3. For write/read without `--address`: connects to the `serve` daemon via IPC (auto-spawns one if none is running); the daemon talks to the TronLink browser extension
+3. For write/read without `--address`: connects to the TronLink browser extension for wallet info
 4. Builds unsigned transaction using local TronWeb `transactionBuilder`
 5. Sends transaction to TronLink for signing (browser approval page)
 6. Broadcasts: signer broadcasts by default (returns txId); with `--local-broadcast`, CLI broadcasts locally and verifies the result
@@ -317,15 +294,6 @@ tronlink reclaim --fromAddress <from> --amount <amount> --resource energy --json
 ```bash
 tronlink vote --votes <addr:count...> --json
 tronlink reward --json
-```
-
-#### Session / Network
-
-```bash
-tronlink connect --json
-tronlink network --json
-tronlink network --network nile --json
-tronlink serve stop
 ```
 
 ### Common Token Contracts
