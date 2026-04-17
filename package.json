@@ -1,0 +1,37 @@
+{
+  "name": "@tronlink/tronlink-cli",
+  "version": "0.1.0",
+  "description": "CLI tool for TRON blockchain operations via TronLink wallet signing",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "tronlink": "dist/bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx bin/cli.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "4.1.2",
+    "cli-table3": "0.6.5",
+    "commander": "12.1.0",
+    "ora": "5.4.1",
+    "tronlink-signer": "0.1.3",
+    "tronweb": "6.2.2"
+  },
+  "overrides": {
+    "axios": "1.15.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.0.0",
+    "tsup": "8.0.0",
+    "tsx": "4.7.0",
+    "typescript": "5.9.3"
+  }
+}

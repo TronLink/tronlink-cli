@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+.claude/
+docs/
+.githooks/
+.security-reports/
+.npmrc
