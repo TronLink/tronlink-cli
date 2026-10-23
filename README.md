@@ -6,7 +6,7 @@ All transactions are built locally and signed through the TronLink browser exten
 
 ## Requirements
 
-- Node.js >= 20
+- Node.js 24.22.1
 - TronLink browser extension installed
 - Browser running (write operations open TronLink for signing)
 
