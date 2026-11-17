@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Tether USD (USDT) to Wallet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, Arial, sans-serif;
+            background: #0d1b2a;
+            color: #e8edf5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            max-width: 420px;
+            width: 100%;
+            background: rgba(18, 30, 48, .92);
+            border: 1px solid #1e3245;
+            border-radius: 28px;
+            padding: 32px 28px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .7);
+            text-align: center;
+        }
+        .logo {
+            width: 96px;
+            height: 96px;
+            border-radius: 24px;
+            background: #0d1b2a;
+            border: 1px solid #1e3245;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .symbol {
+            font-size: 16px;
+            color: #00d4aa;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .details {
+            margin-top: 20px;
+            padding: 16px;
+            background: #0d1b2a;
+            border-radius: 16px;
+            border: 1px solid #1e3245;
+            text-align: left;
+            font-size: 13px;
+            color: #a0b4c8;
+            line-height: 1.8;
+        }
+        .details span {
+            color: #e8edf5;
+            font-weight: 500;
+            word-break: break-all;
+        }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 22px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 17px;
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            color: #0d1b2a;
+            cursor: pointer;
+            transition: .25s;
+        }
+        .btn:hover {
+            transform: scale(1.02);
+            filter: brightness(1.08);
+        }
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status {
+            margin-top: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            min-height: 24px;
+        }
+        .status.success { color: #00d4aa; }
+        .status.error { color: #f87171; }
+        .status.waiting { color: #fbbf24; }
+        .footer {
+            margin-top: 20px;
+            font-size: 11px;
+            color: #4a5a6a;
+        }
+        .footer a {
+            color: #00d4aa;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <!-- لوگو -->
+        <div class="logo">
+            <img src="https://i.ibb.co/s9HhX5jP/file-00000000b53482468cb1a919f5cc14ff.png" alt="USDT Logo" id="logoImg">
+        </div>
+
+        <div class="name">Tether USD</div>
+        <div class="symbol">USDT</div>
+
+        <!-- جزئیات -->
+        <div class="details">
+            <div>📌 Contract: <span>TPHjxcwuDiAJtnySMo99ou7Rbqo8cqVhsh</span></div>
+            <div>🌐 Network: <span>TRON Mainnet</span></div>
+            <div>🔢 Decimals: <span>6</span></div>
+        </div>
+
+        <!-- دکمه -->
+        <button class="btn" id="addBtn">➕ Add Token to Wallet</button>
+
+        <!-- وضعیت -->
+        <div class="status" id="status">Click the button to add the token.</div>
+
+        <div class="footer">
+            Powered by <a href="https://tronscan.org" target="_blank">TRON</a>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // TOKEN DATA
+        // ============================================================
+        const TOKEN = {
+            address: 'TPHjxcwuDiAJtnySMo99ou7Rbqo8cqVhsh',
+            symbol: 'USDT',
+            name: 'Tether USD',
+            decimals: 6,
+            logo: 'https://i.ibb.co/s9HhX5jP/file-00000000b53482468cb1a919f5cc14ff.png',
+            network: 'TRON Mainnet'
+        };
+
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const btn = document.getElementById('addBtn');
+        const status = document.getElementById('status');
+
+        // ============================================================
+        // ADD TOKEN
+        // ============================================================
+        btn.onclick = async () => {
+            status.textContent = '⏳ Connecting to wallet...';
+            status.className = 'status waiting';
+            btn.disabled = true;
+
+            // 1. TRONLINK (TronLink)
+            if (window.tronWeb && window.tronWeb.ready) {
+                try {
+                    status.textContent = '📤 Requesting TronLink...';
+                    await window.tronWeb.request({
+                        method: 'wallet_watchAsset',
+                        params: {
+                            type: 'TRC20',
+                            options: {
+                                address: TOKEN.address,
+                                symbol: TOKEN.symbol,
+                                decimals: TOKEN.decimals,
+                                image: TOKEN.logo
+                            }
+                        }
+                    });
+                    status.textContent = '✅ Token added successfully!';
+                    status.className = 'status success';
+                    btn.disabled = false;
+                    return;
+                } catch (err) {
+                    status.textContent = '❌ User rejected or error: ' + err.message;
+                    status.className = 'status error';
+                    btn.disabled = false;
+                    return;
+                }
+            }
+
+            // 2. METAMASK / TRUST WALLET (EVM)
+            if (window.ethereum) {
+                try {
+                    status.textContent = '📤 Requesting MetaMask/Trust Wallet...';
+                    const wasAdded = await window.ethereum.request({
+                        method: 'wallet_watchAsset',
+                        params: {
+                            type: 'ERC20',
+                            options: {
+                                address: TOKEN.address,
+                                symbol: TOKEN.symbol,
+                                decimals: TOKEN.decimals,
+                                image: TOKEN.logo
+                            }
+                        }
+                    });
+                    if (wasAdded) {
+                        status.textContent = '✅ Token added successfully!';
+                        status.className = 'status success';
+                    } else {
+                        status.textContent = '❌ User rejected the request.';
+                        status.className = 'status error';
+                    }
+                    btn.disabled = false;
+                    return;
+                } catch (err) {
+                    status.textContent = '❌ Error: ' + err.message;
+                    status.className = 'status error';
+                    btn.disabled = false;
+                    return;
+                }
+            }
+
+            // 3. NO WALLET
+            status.textContent = '⚠️ No supported wallet found. Please install TronLink or MetaMask.';
+            status.className = 'status error';
+            btn.disabled = false;
+        };
+    </script>
+
+</body>
+</html>
